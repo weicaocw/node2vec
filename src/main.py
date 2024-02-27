@@ -83,9 +83,14 @@ def learn_embeddings(walks):
 	'''
 	Learn embeddings by optimizing the Skipgram objective using SGD.
 	'''
-	walks = [map(str, walk) for walk in walks]
-	model = Word2Vec(walks, size=args.dimensions, window=args.window_size, min_count=0, sg=1, workers=args.workers, iter=args.iter)
-	model.save_word2vec_format(args.output)
+	walks = [list(map(str, walk)) for walk in walks]
+	# window: maximum distance between the current and predicted word within a sentence
+	# min_count: ignore all words with total frequency lower than this
+	# sg=1: skip-gram model
+	# iter: number of iterations (epochs) over the corpus
+	#https://github.com/weicaocw/gensim/blob/develop/gensim/models/word2vec.py#L259
+	model = Word2Vec(walks, vector_size=args.dimensions, window=args.window_size, min_count=0, sg=1, workers=args.workers, epochs=args.iter)
+	model.wv.save_word2vec_format(args.output)
 	
 	return
 

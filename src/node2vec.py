@@ -43,9 +43,9 @@ class Graph():
 		G = self.G
 		walks = []
 		nodes = list(G.nodes())
-		print 'Walk iteration:'
+		print('Walk iteration:')
 		for walk_iter in range(num_walks):
-			print str(walk_iter+1), '/', str(num_walks)
+			print(str(walk_iter+1), '/', str(num_walks))
 			random.shuffle(nodes)
 			for node in nodes:
 				walks.append(self.node2vec_walk(walk_length=walk_length, start_node=node))
@@ -88,7 +88,6 @@ class Graph():
 			alias_nodes[node] = alias_setup(normalized_probs)
 
 		alias_edges = {}
-		triads = {}
 
 		if is_directed:
 			for edge in G.edges():
@@ -112,28 +111,28 @@ def alias_setup(probs):
 	'''
 	K = len(probs)
 	q = np.zeros(K)
-	J = np.zeros(K, dtype=np.int)
+	J = np.zeros(K, dtype=np.int32)
 
 	smaller = []
 	larger = []
 	for kk, prob in enumerate(probs):
-	    q[kk] = K*prob
-	    if q[kk] < 1.0:
-	        smaller.append(kk)
-	    else:
-	        larger.append(kk)
-
+		q[kk] = K*prob
+		if q[kk] < 1.0:
+			smaller.append(kk)
+		else:
+			larger.append(kk)
+	
 	while len(smaller) > 0 and len(larger) > 0:
-	    small = smaller.pop()
-	    large = larger.pop()
+		small = smaller.pop()
+		large = larger.pop()
 
-	    J[small] = large
-	    q[large] = q[large] + q[small] - 1.0
-	    if q[large] < 1.0:
-	        smaller.append(large)
-	    else:
-	        larger.append(large)
-
+		J[small] = large
+		q[large] = q[large] + q[small] - 1.0
+		if q[large] < 1.0:
+			smaller.append(large)
+		else:
+			larger.append(large)
+		
 	return J, q
 
 def alias_draw(J, q):
@@ -142,8 +141,12 @@ def alias_draw(J, q):
 	'''
 	K = len(J)
 
+	# choose a random slot
 	kk = int(np.floor(np.random.rand()*K))
+	# if the random 
+	# number is less than the probability of the slot, return the slot
 	if np.random.rand() < q[kk]:
-	    return kk
+		return kk
+	# else return the corresponding slot in the alias table
 	else:
-	    return J[kk]
+		return J[kk]
